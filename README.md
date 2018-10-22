@@ -1,18 +1,21 @@
-# BCH Testnet Faucet
+# WHC Testnet Faucet
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
 
-The code in this repository creates a minimalistic testnet faucet, used to distribute
-testnet coins to developers who need them.
+This repository is forked from the
+[testnet-faucet](https://github.com/christroutner/testnet-faucet)
+repo. That one distributes testnet BCH. This one distributed testnet WHC.
 
-The faucet is composed of a minimalist font end single page app (SPA) using
-jQuery. The back end is a Koa API server based on
-[this koa2 boilerplate](https://github.com/christroutner/babel-free-koa2-api-boilerplate).
-The BCH wallet functionality is implemented by [BITBOX](https://developer.bitcoin.com/bitbox),
-and the testnet donations come from [Bitcoin.com](https://developer.bitcoin.com).
+Wormhole Coins (WHC) are used to create Wormhole tokens. Here is more information
+about getting started with Wormhole tokens:
+- [Wormhole tokens overview](https://developer.bitcoin.com/wormhole.html)
+- [Wormhole API documentation](https://developer.bitcoin.com/wormhole/docs/getting-started)
+- [Wormholecash SDK GitHub Repo](https://github.com/Bitcoin-com/wormholecash)
+- [Wormholecash SDK code examples](https://github.com/Bitcoin-com/wormholecash/tree/master/examples)
 
 This application expects a `wallet.json` file in the root directory. This contains
 the mnemonic seed required to access the funds the faucet will distribute. You can
-generate a wallet using [this BITBOX example]()
+generate a wallet using
+[this Wormhole example](https://github.com/Bitcoin-com/wormhole-sdk/blob/master/examples/create-wallet/create-wallet.js)
 
 ## Requirements
 * node __^8.9.4__

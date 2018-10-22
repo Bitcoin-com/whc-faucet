@@ -35,7 +35,7 @@ application with Docker Compose:
 - `docker-compose build --no-cache` will build the Docker container from scratch.
   If previously used, this will fail without first deleting the `database` folder,
   which is created with root privileges by Docker, so it must be deleted with the
-  `sudo rm -rf database` command.
+  command `sudo rm -rf database`.
 
 - `docker-compose up -d` will run the server in the background (daemon mode).
-  The server attaches to port 3000 on the host by default.
+  The server attaches to port 3001 on the host by default.

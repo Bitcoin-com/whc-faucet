@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BCH Testnet Faucet</title>
+  <title>WHC Testnet Faucet</title>
 
   <link href="css/bootstrap.min.css" media="all" rel="stylesheet" />
   <link href="css/main.css" media="all" rel="stylesheet" />
@@ -21,7 +21,7 @@
 <header class='navbar navbar-default navbar-fixed-top'>
   <nav class='container' role='navigation'>
     <div class='navbar-header'>
-      <a href='index.html' class='navbar-brand'>BCH Testnet Faucet</a>
+      <a href='index.html' class='navbar-brand'>WHC Testnet Faucet</a>
     </div>
   </nav>
 </header>
@@ -30,15 +30,15 @@
   <div class='container'>
     <div class='row well well-lg'>
       <div class='col-md-6'>
-        <h2>BCH Testnet Faucet</h2>
+        <h2>WHC Testnet Faucet</h2>
         <p class='lead'>
-          This is a prototype testnet faucet build with
+          This is a prototype testnet faucet built with
           <a href="https://developer.bitcoin.com/bitbox">BITBOX</a>
           JavaScript SDK for Bitcoin Cash! It currently gives
-          out 0.1 BCH.
+          out 3 WHC.
         </p>
         <p>
-          <a href="https://github.com/christroutner/testnet-faucet" target="_blank">Fork this demo on GitHub!</a>
+          <a href="https://github.com/christroutner/whc-faucet" target="_blank">Fork this demo on GitHub!</a>
         </p>
       </div>
       <div class='col-md-6 visible-md visible-lg'>
@@ -70,8 +70,8 @@
     <div class="row">
       <div class="col-sm-12">
         <p>
-          Please send tBCH back to this faucet at this address:<br>
-          <b>bchtest:qqmd9unmhkpx4pkmr6fkrr8rm6y77vckjvqe8aey35</b>
+          Please send tBCH and tWHC back to this faucet at this address:<br>
+          <b>bchtest:qr8d0cp00a07gwf7ltg4ufu48a849j98x5dj7zk423</b>
         </p>
       </div>
     </div>
@@ -122,7 +122,7 @@
 
       //const resp = await fetch(`http://localhost:5000/coins/${bchAddr}`)
       //const resp = await fetch(`http://decatur.hopto.org:3456/coins/${bchAddr}`)
-      const resp = await fetch(`/coins/${bchAddr}`)
+      const resp = await fetch(`/tokens/${bchAddr}`)
       const body = await resp.json()
       console.log(`body: ${JSON.stringify(body,null,2)}`)
 

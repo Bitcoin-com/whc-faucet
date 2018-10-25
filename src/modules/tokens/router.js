@@ -1,4 +1,5 @@
-// const ensureUser = require('../../middleware/validators')
+"use strict"
+
 const tokens = require("./controller")
 
 // export const baseUrl = '/users'

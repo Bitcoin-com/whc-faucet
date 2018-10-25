@@ -63,7 +63,7 @@
             <input type="text" class="form-control" id="bchAddr" size="60" placeholder="bchtest:qqmd9unmhkpx4pkmr6fkrr8rm6y77vckjvqe8aey35">
           </div>
         </form>
-        <button type="button" class="btn btn-default" onclick="requestBCH()">Get tBCH!</button>
+        <button type="button" class="btn btn-default" onclick="requestWHC()">Get tBCH!</button>
       </div>
     </div>
 
@@ -110,7 +110,7 @@
 
   });
 
-  async function requestBCH() {
+  async function requestWHC() {
     try {
       writeToWell(`Sending request...`)
 
@@ -140,7 +140,7 @@
       appendToWell(`Success: tBCH are on their way!`)
       appendToWell(`TXID: ${body.txid}`)
     } catch(err) {
-      console.log(`Error in requestBCH: `, err)
+      console.log(`Error in requestWHC: `, err)
     }
   }
 

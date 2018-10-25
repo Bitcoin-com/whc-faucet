@@ -44,7 +44,7 @@ async function getTokens(ctx, next) {
     }
 
     // Otherewise send the payment.
-    const txid = await wallet.sendTokens(bchAddr)
+    const txid = await wallet.sendWHC(bchAddr)
     if (!txid) {
       ctx.body = {
         success: false,

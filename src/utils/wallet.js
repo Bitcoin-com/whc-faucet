@@ -6,7 +6,7 @@
 
 module.exports = {
   consolidateUTXOs, // Consolidate up to 20 spendable UTXOs
-  sendBCH // Send BCH to an address.
+  sendWHC // Send WHC tokens to an address.
 }
 
 // Inspect utility used for debugging.
@@ -17,11 +17,11 @@ util.inspect.defaultOptions = {
   depth: 1
 }
 
-const BB = require("bitbox-sdk/lib/bitbox-sdk").default
-const BITBOX = new BB({ restURL: `https://trest.bitcoin.com/v1/` })
-// const BITBOX = new BB({ restURL: `http://localhost:3000/v1/` })
-// const BITBOX = new BB({ restURL: `http://decatur.hopto.org:3003/v1/` })
-//const BITBOX = new BB({ restURL: `http://192.168.0.13:3003/v1/` })
+const WH = require("wormhole-sdk/lib/Wormhole").default
+const Wormhole = new WH({ restURL: `https://trest.bitcoin.com/v1/` })
+// const Wormhole = new BB({ restURL: `http://localhost:3000/v1/` })
+// const Wormhole = new BB({ restURL: `http://decatur.hopto.org:3003/v1/` })
+//const Wormhole = new BB({ restURL: `http://192.168.0.13:3003/v1/` })
 
 const walletInfo = require(`../../wallet.json`)
 
@@ -30,25 +30,25 @@ async function consolidateUTXOs() {
     const mnemonic = walletInfo.mnemonic
 
     // root seed buffer
-    const rootSeed = BITBOX.Mnemonic.toSeed(mnemonic)
+    const rootSeed = Wormhole.Mnemonic.toSeed(mnemonic)
 
     // master HDNode
-    const masterHDNode = BITBOX.HDNode.fromSeed(rootSeed, "testnet") // Testnet
+    const masterHDNode = Wormhole.HDNode.fromSeed(rootSeed, "testnet") // Testnet
 
     // HDNode of BIP44 account
-    const account = BITBOX.HDNode.derivePath(masterHDNode, "m/44'/145'/0'")
+    const account = Wormhole.HDNode.derivePath(masterHDNode, "m/44'/145'/0'")
 
-    const change = BITBOX.HDNode.derivePath(account, "0/0")
+    const change = Wormhole.HDNode.derivePath(account, "0/0")
 
     // get the cash address
-    const cashAddress = BITBOX.HDNode.toCashAddress(change)
+    const cashAddress = Wormhole.HDNode.toCashAddress(change)
     // const cashAddress = walletInfo.cashAddress
 
     // instance of transaction builder
-    const transactionBuilder = new BITBOX.TransactionBuilder("testnet")
+    const transactionBuilder = new Wormhole.TransactionBuilder("testnet")
 
     // Combine all the utxos into the inputs of the TX.
-    const u = await BITBOX.Address.utxo([cashAddress])
+    const u = await Wormhole.Address.utxo([cashAddress])
     const inputs = []
     let originalAmount = 0
 
@@ -57,23 +57,25 @@ async function consolidateUTXOs() {
     for (let i = 0; i < u[0].length; i++) {
       const thisUtxo = u[0][i]
 
-      // Most UTXOs will come from mining rewards, so we need to wait 100
-      // confirmations before we spend them.
-      if (thisUtxo.confirmations > 100) {
-        originalAmount = originalAmount + thisUtxo.satoshis
-        inputs.push(thisUtxo)
-        transactionBuilder.addInput(thisUtxo.txid, thisUtxo.vout)
-      }
+      originalAmount = originalAmount + thisUtxo.satoshis
+      inputs.push(thisUtxo)
+      transactionBuilder.addInput(thisUtxo.txid, thisUtxo.vout)
 
       // Can only do 20 UTXOs at a time.
       if (inputs.length > 19) break
+    }
+
+    // If there aren't very many UTXOs, just exit.
+    if (inputs.length < 5) {
+      console.log(`Not enough UTXOs to bother consolidating. Exiting.`)
+      return
     }
 
     // original amount of satoshis in vin
     // console.log(`originalAmount: ${originalAmount}`)
 
     // get byte count to calculate fee. paying 1 sat/byte
-    const byteCount = BITBOX.BitcoinCash.getByteCount(
+    const byteCount = Wormhole.BitcoinCash.getByteCount(
       { P2PKH: inputs.length },
       { P2PKH: 1 }
     )
@@ -93,7 +95,7 @@ async function consolidateUTXOs() {
     transactionBuilder.addOutput(cashAddress, sendAmount)
 
     // keypair
-    const keyPair = BITBOX.HDNode.toKeyPair(change)
+    const keyPair = Wormhole.HDNode.toKeyPair(change)
 
     // sign w/ HDNode
     let redeemScript
@@ -116,100 +118,86 @@ async function consolidateUTXOs() {
     // console.log(`TX Hex: ${hex}`)
 
     // sendRawTransaction to running BCH node
-    const broadcast = await BITBOX.RawTransactions.sendRawTransaction(hex)
+    const broadcast = await Wormhole.RawTransactions.sendRawTransaction(hex)
     console.log(`\nConsolidating UTXOs. Transaction ID: ${broadcast}`)
   } catch (err) {
     console.log(`Error in consolidateUTXOs: `, err)
   }
 }
 
-// Send BCH to an address
-async function sendBCH(bchAddr) {
+async function sendWHC(bchAddr) {
+  const propertyId = 1 // WH ID identifying the token. 1 === WHC.
+  const TOKEN_QTY = 3 // Number of tokens to send.
+
   try {
     // Exit if not a valid cash address.
     const isValid = validateAddress(bchAddr)
     if (!isValid) return false
 
-    // Amount to send in satoshis
-    const AMOUNT_TO_SEND = 10000000
-
     const mnemonic = walletInfo.mnemonic
 
     // root seed buffer
-    const rootSeed = BITBOX.Mnemonic.toSeed(mnemonic)
+    const rootSeed = Wormhole.Mnemonic.toSeed(mnemonic)
 
     // master HDNode
-    const masterHDNode = BITBOX.HDNode.fromSeed(rootSeed, "testnet") // Testnet
+    const masterHDNode = Wormhole.HDNode.fromSeed(rootSeed, "testnet") // Testnet
 
     // HDNode of BIP44 account
-    const account = BITBOX.HDNode.derivePath(masterHDNode, "m/44'/145'/0'")
+    const account = Wormhole.HDNode.derivePath(masterHDNode, "m/44'/145'/0'")
 
-    const change = BITBOX.HDNode.derivePath(account, "0/0")
+    const change = Wormhole.HDNode.derivePath(account, "0/0")
 
+    // get the cash address
+    //const cashAddress = Wormhole.HDNode.toCashAddress(change)
     const cashAddress = walletInfo.cashAddress
 
-    // Get the biggest UTXO, which is assumed to be spendable.
-    const u = await BITBOX.Address.utxo([cashAddress])
+    // Create simple send payload.
+    const payload = await Wormhole.PayloadCreation.simpleSend(
+      propertyId,
+      TOKEN_QTY.toString()
+    )
+
+    // Get a utxo to use for this transaction.
+    const u = await Wormhole.Address.utxo([cashAddress])
     const utxo = findBiggestUtxo(u[0])
 
-    // instance of transaction builder
-    const transactionBuilder = new BITBOX.TransactionBuilder("testnet")
+    // Create a rawTx using the largest utxo in the wallet.
+    utxo.value = utxo.amount
+    const rawTx = await Wormhole.RawTransactions.create([utxo], {})
 
-    const satoshisToSend = AMOUNT_TO_SEND
-    const originalAmount = utxo.satoshis
+    // Add the token information as an op-return code to the tx.
+    const opReturn = await Wormhole.RawTransactions.opReturn(rawTx, payload)
 
-    const vout = utxo.vout
-    const txid = utxo.txid
+    // Set the destination/recieving address for the tokens, with the actual
+    // amount of BCH set to a minimal amount.
+    const ref = await Wormhole.RawTransactions.reference(opReturn, bchAddr)
 
-    // add input with txid and index of vout
-    transactionBuilder.addInput(txid, vout)
-
-    // get byte count to calculate fee. paying 1 sat/byte
-    const byteCount = BITBOX.BitcoinCash.getByteCount(
-      { P2PKH: 1 },
-      { P2PKH: 2 }
+    // Generate a change output.
+    const changeHex = await Wormhole.RawTransactions.change(
+      ref, // Raw transaction we're working with.
+      [utxo], // Previous utxo
+      cashAddress, // Destination address.
+      0.000005 // Miner fee.
     )
 
-    // Calculate the TX fee.
-    const satoshisPerByte = 1
-    const txFee = Math.floor(satoshisPerByte * byteCount)
+    const tx = Wormhole.Transaction.fromHex(changeHex)
+    const tb = Wormhole.Transaction.fromTransaction(tx)
 
-    // amount to send back to the sending address. It's the original amount - 1 sat/byte for tx size
-    const remainder = originalAmount - satoshisToSend - txFee
-
-    // add output w/ address and amount to send
-    transactionBuilder.addOutput(cashAddress, remainder)
-    transactionBuilder.addOutput(
-      BITBOX.Address.toLegacyAddress(bchAddr),
-      satoshisToSend
-    )
-
-    // Generate a keypair from the change address.
-    const keyPair = BITBOX.HDNode.toKeyPair(change)
-
-    // Sign the transaction with the HD node.
+    // Finalize and sign transaction.
+    const keyPair = Wormhole.HDNode.toKeyPair(change)
     let redeemScript
-    transactionBuilder.sign(
-      0,
-      keyPair,
-      redeemScript,
-      transactionBuilder.hashTypes.SIGHASH_ALL,
-      originalAmount
-    )
-
-    // build tx
-    const tx = transactionBuilder.build()
-    // output rawhex
-    const hex = tx.toHex()
+    tb.sign(0, keyPair, redeemScript, 0x01, utxo.satoshis)
+    const builtTx = tb.build()
+    const txHex = builtTx.toHex()
 
     // sendRawTransaction to running BCH node
-    const broadcast = await BITBOX.RawTransactions.sendRawTransaction(hex)
-    console.log(`Sending BCH. Transaction ID: ${broadcast}`)
+    const broadcast = await Wormhole.RawTransactions.sendRawTransaction(txHex)
+
+    console.log(`Sending WHC. Transaction ID: ${broadcast}`)
 
     return broadcast
   } catch (err) {
-    console.log(`Error in wallet.sendBCH().`)
-    throw err
+    console.log(err)
   }
 }
 
@@ -233,8 +221,8 @@ function findBiggestUtxo(utxos) {
 // Returns true if BCH address is valid, false otherwise.
 function validateAddress(bchAddr) {
   try {
-    BITBOX.Address.isCashAddress(bchAddr)
-    BITBOX.Address.isTestnetAddress(bchAddr)
+    Wormhole.Address.isCashAddress(bchAddr)
+    Wormhole.Address.isTestnetAddress(bchAddr)
     return true
   } catch (err) {
     return false

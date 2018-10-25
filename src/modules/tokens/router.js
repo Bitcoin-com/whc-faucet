@@ -1,8 +1,8 @@
 // const ensureUser = require('../../middleware/validators')
-const coins = require('./controller')
+const tokens = require("./controller")
 
 // export const baseUrl = '/users'
-module.exports.baseUrl = '/coins'
+module.exports.baseUrl = "/tokens"
 
 module.exports.routes = [
   /*
@@ -24,11 +24,11 @@ module.exports.routes = [
   */
 
   {
-    method: 'GET',
-    route: '/:bchaddr',
+    method: "GET",
+    route: "/:bchaddr",
     handlers: [
       // ensureUser,
-      coins.getCoins
+      tokens.getTokens
     ]
   }
 

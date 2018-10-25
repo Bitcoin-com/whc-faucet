@@ -1,3 +1,5 @@
+"use strict"
+
 // Instantiate the models.
 const BchAddresses = require("../../models/bch-addresses")
 const IpAddresses = require("../../models/ip-addresses")
@@ -13,7 +15,7 @@ util.inspect.defaultOptions = {
 }
 
 // Sends coins to the user.
-async function getCoins(ctx, next) {
+async function getTokens(ctx, next) {
   try {
     // Get the IP of the requester.
     //const ip = ctx.request.ip // Normal usage
@@ -42,7 +44,7 @@ async function getCoins(ctx, next) {
     }
 
     // Otherewise send the payment.
-    const txid = await wallet.sendBCH(bchAddr)
+    const txid = await wallet.sendTokens(bchAddr)
     if (!txid) {
       ctx.body = {
         success: false,
@@ -73,7 +75,7 @@ async function getCoins(ctx, next) {
 }
 
 module.exports = {
-  getCoins
+  getTokens
 }
 
 // Checks if the IP address exists in the DB. Returns true or false.

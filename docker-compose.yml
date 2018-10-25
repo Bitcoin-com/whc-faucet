@@ -13,7 +13,7 @@ whc-faucet:
   build: .
   dockerfile: Dockerfile
   links:
-    - mongodb
+    - whc-mongodb
   ports:
     - "3001:3456"  # <host port>:<container port>
 

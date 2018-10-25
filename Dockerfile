@@ -31,7 +31,7 @@ RUN echo "export PATH=~/.npm-global/bin:$PATH" >> /home/myuser/.profile
 RUN runuser -l myuser -c "npm config set prefix '~/.npm-global'"
 
 # Expose the port the API will be served on.
-EXPOSE 3000
+EXPOSE 3456
 
 
 # Switch to user account.
@@ -41,14 +41,14 @@ RUN echo 'password' | sudo -S pwd
 
 # Clone the repository
 WORKDIR /home/myuser
-RUN git clone https://github.com/christroutner/testnet-faucet
-WORKDIR /home/myuser/testnet-faucet
+RUN git clone https://github.com/christroutner/whc-faucet
+WORKDIR /home/myuser/whc-faucet
 
 # Install dependencies
 RUN npm install
 
 # Copy the wallet.json file into the Docker container.
-COPY wallet.json /home/myuser/testnet-faucet/wallet.json
+COPY wallet.json /home/myuser/whc-faucet/wallet.json
 
 # Start the application.
 COPY start-production start-production

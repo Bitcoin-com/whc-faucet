@@ -14,6 +14,23 @@ util.inspect.defaultOptions = {
   depth: 1
 }
 
+// Return the balance of the wallet.
+async function getBalance(ctx, next) {
+  try {
+    const balance = await wallet.getBalance()
+
+    ctx.body = balance
+  } catch (err) {
+    console.log(`Error in getBalance: `, err)
+
+    if (err === 404 || err.name === "CastError") ctx.throw(404)
+
+    ctx.throw(500)
+  }
+
+  if (next) return next()
+}
+
 // Sends coins to the user.
 async function getTokens(ctx, next) {
   try {
@@ -75,7 +92,8 @@ async function getTokens(ctx, next) {
 }
 
 module.exports = {
-  getTokens
+  getTokens,
+  getBalance
 }
 
 // Checks if the IP address exists in the DB. Returns true or false.

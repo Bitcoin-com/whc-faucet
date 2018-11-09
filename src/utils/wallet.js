@@ -6,7 +6,8 @@
 
 module.exports = {
   consolidateUTXOs, // Consolidate up to 20 spendable UTXOs
-  sendWHC // Send WHC tokens to an address.
+  sendWHC, // Send WHC tokens to an address.
+  getBalance // Get the blanace of BCH and WHC
 }
 
 // Inspect utility used for debugging.
@@ -227,4 +228,44 @@ function validateAddress(bchAddr) {
   } catch (err) {
     return false
   }
+}
+
+async function getBalance() {
+  const mnemonic = walletInfo.mnemonic
+
+  // root seed buffer
+  const rootSeed = Wormhole.Mnemonic.toSeed(mnemonic)
+
+  // master HDNode
+  const masterHDNode = Wormhole.HDNode.fromSeed(rootSeed, "testnet") // Testnet
+
+  // HDNode of BIP44 account
+  const account = Wormhole.HDNode.derivePath(masterHDNode, "m/44'/145'/0'")
+
+  const change = Wormhole.HDNode.derivePath(account, "0/0")
+
+  // get the cash address
+  const cashAddress = Wormhole.HDNode.toCashAddress(change)
+
+  // first get BCH balance
+  const balanceObj = await Wormhole.Address.details([cashAddress])
+  const retObj = {}
+  retObj.bch = balanceObj[0].balance
+  //console.log(`balance: ${JSON.stringify(balance, null, 2)}`)
+
+  // get token balances
+  try {
+    const tokens = await Wormhole.DataRetrieval.balancesForAddress(cashAddress)
+
+    const WHC = tokens.find(token => token.propertyid === 1)
+    retObj.whc = WHC.balance
+
+    //console.log(JSON.stringify(tokens, null, 2))
+  } catch (error) {
+    if (error.message === "Address not found") console.log(`No tokens found.`)
+  }
+
+  //console.log(`BCH Balance information for ${cashAddress}:`)
+  console.log(`BCH balance: ${retObj.bch}, WHC balance: ${retObj.whc}`)
+  return retObj
 }

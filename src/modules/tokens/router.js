@@ -14,16 +14,12 @@ module.exports.routes = [
       user.createUser
     ]
   },
-  {
-    method: 'GET',
-    route: '/',
-    handlers: [
-      ensureUser,
-      user.getUsers
-    ]
-  },
   */
-
+  {
+    method: "GET",
+    route: "/",
+    handlers: [tokens.getBalance]
+  },
   {
     method: "GET",
     route: "/:bchaddr",

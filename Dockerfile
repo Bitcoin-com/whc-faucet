@@ -41,7 +41,7 @@ RUN echo 'password' | sudo -S pwd
 
 # Clone the repository
 WORKDIR /home/myuser
-RUN git clone https://github.com/christroutner/whc-faucet
+RUN git clone https://github.com/Bitcoin-com/whc-faucet
 WORKDIR /home/myuser/whc-faucet
 
 # Install dependencies
